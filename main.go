@@ -26,7 +26,7 @@ func TestErrOutput(t *testing.T, l logger.Logger, err error, got, expected inter
 }
 
 func TestErr(t *testing.T, l logger.Logger, message string, err error, got, expected interface{}) {
-	if got == expected {
+	if reflect.DeepEqual(got, expected) {
 		return
 	}
 
