@@ -37,22 +37,23 @@ func TestErr(t *testing.T, l logger.Logger, message string, err error, got, expe
 	l.Notice("GOT:\n", got)
 	l.Notice("EXPECTED:\n", expected)
 
-	if reflect.TypeOf(got).Name() == "string" {
-		differ := diffmatchpatch.New()
-		diff := differ.DiffMain(expected.(string), got.(string), true)
+	differ := diffmatchpatch.New()
+	diff := differ.DiffMain(fmt.Sprintf("%+v", expected),
+		fmt.Sprintf("%+v", got), true)
 
-		l.Notice("DIFF:")
-		for _, line := range diff {
-			switch line.Type {
-			case diffmatchpatch.DiffDelete:
-				fmt.Print("\033[32m" + line.Text + "\033[0m")
-			case diffmatchpatch.DiffInsert:
-				fmt.Print("\033[31m" + line.Text + "\033[0m")
-			default:
-				fmt.Print(line.Text)
-			}
+	l.Notice("DIFF:")
+	for _, line := range diff {
+		switch line.Type {
+		case diffmatchpatch.DiffDelete:
+			fmt.Print("\033[32m" + line.Text + "\033[0m")
+		case diffmatchpatch.DiffInsert:
+			fmt.Print("\033[31m" + line.Text + "\033[0m")
+		default:
+			fmt.Print(line.Text)
 		}
 	}
+	fmt.Println("")
+	fmt.Println("")
 
 	t.Fail()
 }
