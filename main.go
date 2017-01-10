@@ -6,42 +6,47 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
 	"github.com/sergi/go-diff/diffmatchpatch"
+
+	log "github.com/Sirupsen/logrus"
 )
 
-func TestOutput(t *testing.T, l logger.Logger, got, expected interface{}) {
+func TestOutput(t *testing.T, got, expected interface{}) {
 	message := "Did not get the expected output"
-	Test(t, l, message, got, expected)
+	Test(t, message, got, expected)
 }
 
-func Test(t *testing.T, l logger.Logger, message string, got, expected interface{}) {
-	TestErr(t, l, message, errors.New("no error"), got, expected)
+func Test(t *testing.T, message string, got, expected interface{}) {
+	TestErr(t, message, errors.New("no error"), got, expected)
 }
 
-func TestErrOutput(t *testing.T, l logger.Logger, err error, got, expected interface{}) {
+func TestErrOutput(t *testing.T, err error, got, expected interface{}) {
 	message := "Did not get the expected output"
-	TestErr(t, l, message, err, got, expected)
+	TestErr(t, message, err, got, expected)
 }
 
-func TestErr(t *testing.T, l logger.Logger, message string, err error, got, expected interface{}) {
+func TestErr(t *testing.T, message string, err error, got, expected interface{}) {
 	if reflect.DeepEqual(got, expected) {
 		return
 	}
 
-	l.Error("MESSAGE : ", message)
+	log.Error("MESSAGE: ", message)
 	if err != nil {
-		l.Notice("ERROR: ", errgo.Details(err))
+		log.Error("ERROR: ", errgo.Details(err))
 	}
-	l.Notice("GOT:\n", got)
-	l.Notice("EXPECTED:\n", expected)
+	log.Info("GOT:\n", got)
+	fmt.Println("")
+
+	log.Info("EXPECTED:\n", expected)
 
 	differ := diffmatchpatch.New()
 	diff := differ.DiffMain(fmt.Sprintf("%+v", expected),
 		fmt.Sprintf("%+v", got), true)
 
-	l.Notice("DIFF:")
+	fmt.Println("")
+
+	log.Info("DIFF:")
 	for _, line := range diff {
 		switch line.Type {
 		case diffmatchpatch.DiffDelete:
